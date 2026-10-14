@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Routine Guide | Independent demo</title>
+<meta name="description" content="Independent portfolio demo: compare one cleanser and two moisturizers by scent, texture, skin type and price. Not affiliated with Sephora. No real purchases.">
+<!-- ============ STEP 2 (Stage 5): paste the GTM <head> snippet here, replacing GTM-XXXXXXX with your container ID ============ -->
+<!-- <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-XXXXXXX');</script> -->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- ============ STEP 2 (Stage 5): paste the GTM <noscript> snippet right here, after <body> ============ -->
+
+<div class="disclosure" role="note">Independent portfolio concept by Disha Surati. <strong>Not affiliated with Sephora.</strong> No real purchases; nothing is sold.</div>
+
+<header class="nav">
+  <a class="brand" href="index.html">The Routine Guide</a>
+  <nav><a href="guide.html">The two-step guide</a><button class="cart-btn" id="openCart" aria-label="Open bag">Bag (<span id="cartCount">0</span>)</button></nav>
+</header>
+
+<main id="landing">
+  <section class="hero">
+    <p class="eyebrow">Independent concept · demo</p>
+    <h1>Two steps. Fewer guesses.</h1>
+    <p class="lead">Compare one cleanser and two moisturizers, with scent, texture and price in one place.</p>
+    <a class="btn" href="#products">Compare the three products</a>
+  </section>
+
+  <section id="products" class="products" aria-label="Products">
+    <article class="card" data-id="P7880">
+      <div class="ph" aria-hidden="true">product photo</div>
+      <p class="kind">Cleanser · $39</p>
+      <h2>Know the scent first.</h2>
+      <p class="pname">fresh Soy Hydrating Gentle Face Cleanser</p>
+      <p>Cucumber scent, light lather, and it removes mascara (per the brand). Try the mini first.</p>
+      <div class="actions"><button class="btn ghost" data-action="details">Details</button><button class="btn" data-action="add">Add to bag</button></div>
+    </article>
+    <article class="card" data-id="P248407">
+      <div class="ph" aria-hidden="true">product photo</div>
+      <p class="kind">Moisturizer · $42</p>
+      <h2>Prone to pilling? Go thin.</h2>
+      <p class="pname">First Aid Beauty Ultra Repair Cream</p>
+      <p>A rich cream: use a thin layer and let serums dry first. Fragrance free.</p>
+      <div class="actions"><button class="btn ghost" data-action="details">Details</button><button class="btn" data-action="add">Add to bag</button></div>
+    </article>
+    <article class="card" data-id="P427421">
+      <div class="ph" aria-hidden="true">product photo</div>
+      <p class="kind">Moisturizer · $72</p>
+      <h2>See the price per size.</h2>
+      <p class="pname">Drunk Elephant Protini Polypeptide Cream</p>
+      <p>$72 for 50 mL, with a mini to try and a refill pod.</p>
+      <div class="actions"><button class="btn ghost" data-action="details">Details</button><button class="btn" data-action="add">Add to bag</button></div>
+    </article>
+  </section>
+
+  <section class="faq" aria-label="Questions">
+    <h2>Questions</h2>
+    <details><summary>Which one should I start with?</summary><p>Start with the cleanser, then add one moisturizer that lists your skin type.</p></details>
+    <details><summary>Why does my moisturizer pill?</summary><p>Some reviewers report it, especially over serums. Try a thinner layer and let each step dry.</p></details>
+    <details><summary>How do I try before buying full size?</summary><p>Each product has a mini size: see it on the product page.</p></details>
+  </section>
+
+  <section class="signup" id="signup" aria-label="Email signup demonstration">
+    <p class="eyebrow">Signup demonstration · no email is stored or sent</p>
+    <h2>Not ready to buy? Get a short guide to building your routine.</h2>
+    <form id="signupForm" novalidate>
+      <label for="email">Email</label>
+      <div class="row"><input id="email" name="email" type="email" autocomplete="off" placeholder="name@example.com"><button class="btn" type="submit">Send me the guide</button></div>
+      <p class="error" id="emailError" role="alert" hidden>Please enter a valid email address, like name@example.com.</p>
+    </form>
+    <p class="success" id="signupSuccess" role="status" hidden>You're in. Your first routine tip is on its way. <span class="muted">(Demo: nothing was stored or sent.)</span></p>
+  </section>
+</main>
+
+<!-- Product details -->
+<div class="overlay" id="detailOverlay" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+    <button class="close" data-close aria-label="Close details">×</button>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<!-- Bag -->
+<div class="overlay" id="cartOverlay" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+    <button class="close" data-close aria-label="Close bag">×</button>
+    <h2 id="cartTitle">Your bag</h2>
+    <p class="muted" id="cartReminder">Your bag is saved. Still comparing? Scent and texture notes are on each product.</p>
+    <ul id="cartList" class="cart-list"></ul>
+    <p class="total">Total: <strong id="cartTotal">$0.00</strong></p>
+    <button class="btn" id="checkoutBtn">Checkout (demo)</button>
+  </div>
+</div>
+
+<!-- Mock checkout -->
+<div class="overlay" id="checkoutOverlay" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="coTitle">
+    <button class="close" data-close aria-label="Close checkout">×</button>
+    <h2 id="coTitle">Practice checkout</h2>
+    <p class="notice">This is a demo. There are no payment fields, and no payment is collected.</p>
+    <ul id="coList" class="cart-list"></ul>
+    <p class="total">Total: <strong id="coTotal">$0.00</strong></p>
+    <button class="btn" id="placeOrder">Place demo order</button>
+  </div>
+</div>
+
+<!-- Confirmation -->
+<div class="overlay" id="confirmOverlay" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="okTitle">
+    <button class="close" data-close aria-label="Close confirmation">×</button>
+    <h2 id="okTitle">Demo order complete.</h2>
+    <p>This is a practice checkout; no payment was collected.</p>
+    <p class="muted">Test transaction ID: <code id="txnId"></code></p>
+  </div>
+</div>
+
+<footer class="foot">Independent portfolio concept by Disha Surati. Not affiliated with Sephora. Product facts checked on sephora.com on 2026-10-12; prices may change. No real products are sold.</footer>
+<script src="app.js"></script>
+</body>
+</html>
