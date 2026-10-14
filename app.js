@@ -48,7 +48,7 @@ document.querySelectorAll('[data-action="details"]').forEach(btn => btn.addEvent
   $('detailBody').innerHTML = PRODUCTS[id].detail + `<p><button class="btn" id="detailAdd">Add to bag</button></p>`;
   open('detailOverlay');
   track('view_item', { currency: 'USD', value: PRODUCTS[id].price, items: [itemFor(id)] });
-  $('detailAdd').addEventListener('click', () => addToCart(id));
+  $('detailAdd').addEventListener('click', () => addToCart(id, $('detailAdd')));
   const t = $('tipsToggle');
   if (t) t.addEventListener('click', () => {
     const tips = $('tips'); const opening = tips.hidden; tips.hidden = !opening; t.setAttribute('aria-expanded', String(opening));
@@ -57,13 +57,27 @@ document.querySelectorAll('[data-action="details"]').forEach(btn => btn.addEvent
 }));
 
 // add_to_cart: once per completed click
-function addToCart(id) {
+function addToCart(id, btn) {
   const line = cart.find(c => c.item_id === id);
   if (line) line.quantity += 1; else cart.push({ item_id: id, quantity: 1 });
   renderCart();
   track('add_to_cart', { currency: 'USD', value: PRODUCTS[id].price, items: [itemFor(id)] });
+  showAdded(id, btn);
 }
-document.querySelectorAll('[data-action="add"]').forEach(btn => btn.addEventListener('click', () => addToCart(btn.closest('.card').dataset.id)));
+// QA-21 fix: visible + screen-reader confirmation after Add to bag
+const toast = document.createElement('div');
+toast.id = 'addedToast'; toast.setAttribute('role', 'status'); toast.setAttribute('aria-live', 'polite');
+toast.style.cssText = 'position:fixed;left:16px;bottom:16px;z-index:9999;background:#1f1b16;color:#fff;padding:12px 16px;border-radius:10px;font:inherit;max-width:calc(100vw - 32px);box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .2s;pointer-events:none';
+document.body.appendChild(toast);
+let toastTimer;
+function showAdded(id, btn) {
+  const n = cart.reduce((s, c) => s + c.quantity, 0);
+  toast.textContent = `Added to bag: ${PRODUCTS[id].item_brand} ${PRODUCTS[id].item_name}. Bag now has ${n} item${n === 1 ? '' : 's'}.`;
+  toast.style.opacity = '1';
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+  if (btn) { const label = btn.textContent; btn.textContent = 'Added ✓'; setTimeout(() => { btn.textContent = label; }, 1200); }
+}
+document.querySelectorAll('[data-action="add"]').forEach(btn => btn.addEventListener('click', () => addToCart(btn.closest('.card').dataset.id, btn)));
 
 function renderList(ul) {
   ul.innerHTML = cart.length ? cartItems().map(i => `<li><span>${i.item_brand} ${i.item_name} × ${i.quantity}</span><span>${money(i.price * i.quantity)}</span></li>`).join('')
