@@ -19,6 +19,31 @@ const PRODUCTS = {
 };
 
 const cart = []; // {item_id, quantity}
+
+// QA-33 fix: the bag survives a reload and can be rebuilt from a cart email link.
+// Link format: index.html?cart=P248407 or ?cart=P248407:2,P7880:1 (known product ids only, quantity 1 to 9).
+// Restoring a bag fires no add_to_cart event, so GA4 counts only real clicks.
+const CART_KEY = 'routineGuideCart';
+function saveCart() { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) {} }
+function parseCart(text) {
+  const out = [];
+  String(text || '').split(',').forEach(part => {
+    const [id, q] = part.trim().split(':');
+    const qty = Math.min(9, Math.max(1, parseInt(q, 10) || 1));
+    if (!PRODUCTS[id]) return;
+    const line = out.find(c => c.item_id === id);
+    if (line) line.quantity = Math.min(9, line.quantity + qty); else out.push({ item_id: id, quantity: qty });
+  });
+  return out;
+}
+function loadCart() {
+  const fromLink = new URLSearchParams(location.search).get('cart');
+  if (fromLink !== null) { const lines = parseCart(fromLink); return { lines, fromLink: true, linkBroken: lines.length === 0 }; }
+  try {
+    const saved = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+    return { lines: Array.isArray(saved) ? saved.filter(c => c && PRODUCTS[c.item_id]).map(c => ({ item_id: c.item_id, quantity: Math.min(9, Math.max(1, parseInt(c.quantity, 10) || 1)) })) : [], fromLink: false };
+  } catch (e) { return { lines: [], fromLink: false }; }
+}
 const $ = (id) => document.getElementById(id);
 const money = (n) => '$' + n.toFixed(2);
 let lastFocus = null;
@@ -87,6 +112,7 @@ function renderCart() {
   $('cartCount').textContent = cart.reduce((s, c) => s + c.quantity, 0);
   renderList($('cartList')); $('cartTotal').textContent = money(cartValue());
   $('checkoutBtn').disabled = cart.length === 0;
+  saveCart();
 }
 $('openCart').addEventListener('click', () => { renderCart(); open('cartOverlay'); });
 
@@ -129,4 +155,11 @@ $('signupForm').addEventListener('submit', e => {
   track('sign_up', null, { method: 'demo_form' });
 });
 
+// Restore the bag on load. A cart email link opens the bag straight away.
+const restored = loadCart();
+restored.lines.forEach(l => cart.push(l));
 renderCart();
+if (restored.fromLink) {
+  if (restored.linkBroken) $('cartReminder').textContent = "We couldn't find the items from that link. Browse the three products below.";
+  open('cartOverlay');
+}
